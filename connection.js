@@ -2,7 +2,7 @@ const mysql=require('mysql')
 var con=mysql.createConnection({
     host:"Priyanka",
     user:"root",
-    password:"Plavate@1234",
+    password:"Sush@264",
     database:"Travel"
 })
 module.exports=con

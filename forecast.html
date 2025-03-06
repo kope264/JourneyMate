@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Forecast</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    .current-weather {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .weather-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .temp {
+      font-size: 48px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .forecast {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    
+    .forecast-day {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .date {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+    
+    .loading, .error {
+      text-align: center;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .error {
+      color: #e74c3c;
+    }
+    
+    .weather-icon {
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weather Forecast</h1>
+  
+  <div class="container">
+    <div class="search-box">
+      <input type="text" id="cityInput" placeholder="Enter city name..." value="New York">
+      <button id="searchBtn">Search</button>
+    </div>
+    
+    <div id="weatherContainer">
+      <div class="loading">Loading weather data...</div>
+    </div>
+  </div>
+  
+  <script>
+    // You'll need to replace this with your own API key from OpenWeatherMap
+    const apiKey = '0c005fa00b6a2d265bfea09a97e0d15f';
+    const weatherContainer = document.getElementById('weatherContainer');
+    const cityInput = document.getElementById('cityInput');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    // Event listeners
+    searchBtn.addEventListener('click', getWeather);
+    cityInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') getWeather();
+    });
+    
+    // Function to fetch weather data
+    async function getWeather() {
+      const city = cityInput.value.trim();
+      
+      if (!city) {
+        showError('Please enter a city name');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        // Get current weather
+        const currentWeatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+        );
+        
+        if (!currentWeatherResponse.ok) {
+          throw new Error('City not found or API error');
+        }
+        
+        const currentWeatherData = await currentWeatherResponse.json();
+        
+        // Get forecast for next 5 days
+        const forecastResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
+        );
+        
+        if (!forecastResponse.ok) {
+          throw new Error('Forecast data not available');
+        }
+        
+        const forecastData = await forecastResponse.json();
+        
+        // Display weather data
+        displayWeather(currentWeatherData, forecastData);
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    // Function to display the weather
+    function displayWeather(current, forecast) {
+      // Process forecast data to get daily forecasts (not hourly)
+      const dailyForecasts = processForecastData(forecast.list);
+      
+      // Create HTML content
+      const html = `
+        <div class="current-weather">
+          <h2>${current.name}, ${current.sys.country}</h2>
+          <div class="weather-info">
+            <div class="temp">${Math.round(current.main.temp)}°C</div>
+            <div class="details">
+              <div>Feels like: ${Math.round(current.main.feels_like)}°C</div>
+              <div>Humidity: ${current.main.humidity}%</div>
+              <div>Wind: ${current.wind.speed} m/s</div>
+              <div>${current.weather[0].description}</div>
+            </div>
+            <img class="weather-icon" src="https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png" alt="${current.weather[0].description}">
+          </div>
+        </div>
+        
+        <h2>5-Day Forecast</h2>
+        <div class="forecast">
+          ${dailyForecasts.map(day => `
+            <div class="forecast-day">
+              <div class="date">${formatDate(day.dt)}</div>
+              <img class="weather-icon" src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="${day.weather[0].description}">
+              <div>${Math.round(day.main.temp_max)}°C / ${Math.round(day.main.temp_min)}°C</div>
+              <div>${day.weather[0].description}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      weatherContainer.innerHTML = html;
+    }
+    
+    // Function to process forecast data (get one forecast per day)
+    function processForecastData(forecastList) {
+      const dailyForecasts = [];
+      const dates = {};
+      
+      // Group forecasts by day and select one forecast per day (noon)
+      forecastList.forEach(item => {
+        const date = new Date(item.dt * 1000).toDateString();
+        
+        // If we haven't seen this date or this is closer to noon
+        if (!dates[date] || Math.abs(new Date(item.dt * 1000).getHours() - 12) < Math.abs(new Date(dates[date].dt * 1000).getHours() - 12)) {
+          dates[date] = item;
+        }
+      });
+      
+      // Convert to array and take first 5 days
+      for (const date in dates) {
+        dailyForecasts.push(dates[date]);
+        if (dailyForecasts.length >= 5) break;
+      }
+      
+      return dailyForecasts;
+    }
+    
+    // Helper function to format date
+    function formatDate(timestamp) {
+      const date = new Date(timestamp * 1000);
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+    
+    // Show loading state
+    function showLoading() {
+      weatherContainer.innerHTML = '<div class="loading">Loading weather data...</div>';
+    }
+    
+    // Show error message
+    function showError(message) {
+      weatherContainer.innerHTML = `<div class="error">Error: ${message}</div>`;
+    }
+    
+    // Load weather data on page load
+    window.onload = getWeather;
+  </script>
+</body>
+</html>
