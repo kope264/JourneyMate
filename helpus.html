@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Crime Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f7;
+            text-align: center;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin: 50px auto;
+            width: 50%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        select, button {
+            margin-top: 10px;
+            padding: 10px;
+        }
+        #safetyLevel {
+            margin-top: 20px;
+            width: 100%;
+            height: 20px;
+            background-color: lightgray;
+            position: relative;
+            border-radius: 10px;
+        }
+        #safetyBar {
+            height: 100%;
+            width: 0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Select a City to View Crime Data</h1>
+        <label for="city-select">Choose a city:</label>
+        <select id="city-select">
+            <option value="">--Select a city--</option>
+        </select>
+        <button id="showDataBtn">Show Crime Data</button>
+        <h2>Safety Meter</h2>
+        <div id="safetyLevel">
+            <div id="safetyBar"></div>
+        </div>
+        <p id="safetyIndexValue"></p>
+        <p id="safetyInfo"></p>
+    </div>
+    
+    <script>
+        const apiUrl = "https://api.crimecheck.in/crime-report?api_key=YOUR_API_KEY";
+
+        async function fetchCrimeData() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                return data.cities;
+            } catch (error) {
+                console.error("Error fetching crime data:", error);
+                return [];
+            }
+        }
+
+        async function populateCities() {
+            const citySelect = document.getElementById("city-select");
+            const crimeData = await fetchCrimeData();
+            
+            crimeData.forEach(data => {
+                const option = document.createElement("option");
+                option.value = data.city;
+                option.textContent = data.city;
+                citySelect.appendChild(option);
+            });
+        }
+
+        async function displayCrimeData() {
+            const selectedCity = document.getElementById("city-select").value;
+            if (!selectedCity) {
+                alert("Please select a city.");
+                return;
+            }
+            
+            const crimeData = await fetchCrimeData();
+            const cityData = crimeData.find(data => data.city === selectedCity);
+            if (!cityData) {
+                alert("No data available for this city.");
+                return;
+            }
+            
+            const safetyIndex = cityData.total_cases / 100000;
+            document.getElementById("safetyIndexValue").textContent = `Safety Index: ${safetyIndex.toFixed(2)} cases per 100,000 residents`;
+            
+            const safetyBar = document.getElementById("safetyBar");
+            safetyBar.style.width = `${safetyIndex * 10}%`;
+            safetyBar.style.backgroundColor = safetyIndex < 2 ? "green" : safetyIndex < 4 ? "yellow" : "red";
+        }
+
+        document.getElementById("showDataBtn").addEventListener("click", displayCrimeData);
+        window.onload = populateCities;
+    </script>
+</body>
+</html>

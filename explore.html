@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Explorer</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, h3, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        #citySearchForm {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #cityInput {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 200px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #cityInfo {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        #cityInfo h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        #cityInfo p {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #cityInfo h3 {
+            font-size: 1.5em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        #cityInfo ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #cityInfo ul li {
+            background: #eee;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        #cityInfo p strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <form id="citySearchForm">
+        <input type="text" id="cityInput" placeholder="Enter City Name">
+        <button type="submit">Explore</button>
+    </form>
+    
+    <div id="cityInfo"></div>
+    <script>
+        const citiesData = {
+            "New York": {
+                name: "New York",
+                description: "The city that never sleeps.",
+                attractions: ["Statue of Liberty", "Central Park", "Empire State Building"],
+                weather: "Mild winters, hot summers",
+                safety: "Moderately safe with low crime rates in tourist areas"
+            },
+            "Paris": {
+                name: "Paris",
+                description: "The city of light and love.",
+                attractions: ["Eiffel Tower", "Louvre Museum", "Notre-Dame Cathedral"],
+                weather: "Cool winters, warm summers",
+                safety: "Safe, but beware of pickpockets in crowded areas"
+            },
+            "Pandharpur": {
+                name: "Pandharpur",
+                description: "A prominent pilgrimage town in Maharashtra, famous for the Vithoba temple.",
+                attractions: ["Vithoba Temple", "Pandharpur Fort", "Chandreshwar Temple"],
+                weather: "Hot and dry with monsoon rains",
+                safety: "Generally safe, with high safety around religious sites"
+            },
+            "Solapur": {
+                name: "Solapur",
+                description: "Known for its historical sites and textile industry.",
+                attractions: ["Siddheshwar Temple", "Solapur Fort", "Haji Malang", "Bhui-Bhondeshwar Temple"],
+                weather: "Hot and dry with moderate monsoon rains",
+                safety: "Moderate, with standard precautions needed in crowded areas"
+            },
+            "Kolhapur": {
+                name: "Kolhapur",
+                description: "Famous for its rich heritage, the Mahalaxmi Temple, and Kolhapuri chappals.",
+                attractions: ["Mahalaxmi Temple", "Panhala Fort", "Kolhapur Chappal", "Rankala Lake"],
+                weather: "Tropical climate with heavy monsoons",
+                safety: "High, generally safe with routine precautions"
+            },
+            "Mumbai": {
+                name: "Mumbai",
+                description: "The financial capital of India, bustling with energy and diverse culture.",
+                attractions: ["Gateway of India", "Marine Drive", "Elephanta Caves", "Chhatrapati Shivaji Terminus"],
+                weather: "Hot and humid with heavy monsoon rains",
+                safety: "Moderate, with higher safety in tourist areas"
+            },
+            "Delhi": {
+                name: "Delhi",
+                description: "The vibrant capital city known for its rich history and bustling streets.",
+                attractions: ["Red Fort", "Qutub Minar", "India Gate", "Humayun's Tomb"],
+                weather: "Extreme temperature variations with dry winters and hot summers",
+                safety: "Moderate, with vigilance needed in crowded areas"
+            },
+            "Bengaluru": {
+                name: "Bengaluru",
+                description: "The Silicon Valley of India, renowned for its pleasant climate and tech industry.",
+                attractions: ["Lalbagh Botanical Garden", "Bangalore Palace", "Cubbon Park", "Vidhana Soudha"],
+                weather: "Pleasant and moderate throughout the year",
+                safety: "High, generally safe for visitors"
+            },
+            "Kolkata": {
+                name: "Kolkata",
+                description: "Known for its colonial architecture, cultural heritage, and vibrant festivals.",
+                attractions: ["Victoria Memorial", "Howrah Bridge", "Indian Museum", "Kalighat Temple"],
+                weather: "Tropical climate with heavy monsoons",
+                safety: "Moderate, with higher safety in major tourist areas"
+            },
+            "Chennai": {
+                name: "Chennai",
+                description: "A major cultural and economic hub with a rich history and beautiful coastal scenery.",
+                attractions: ["Marina Beach", "Kapaleeshwarar Temple", "Breezy Beach", "Fort St. George"],
+                weather: "Hot and humid with a tropical climate",
+                safety: "High, generally safe with routine precautions"
+            }
+        };
+
+        document.getElementById('citySearchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const cityName = document.getElementById('cityInput').value;
+            displayCityInfo(cityName);
+        });
+        
+        function displayCityInfo(cityName) {
+            const cityInfoDiv = document.getElementById('cityInfo');
+            cityInfoDiv.innerHTML = ''; // Clear previous info
+        
+            if (citiesData[cityName]) {
+                const city = citiesData[cityName];
+                cityInfoDiv.innerHTML = `
+                    <h2>${city.name}</h2>
+                    <p>${city.description}</p>
+                    <h3>Attractions</h3>
+                    <ul>${city.attractions.map(attraction => `<li>${attraction}</li>`).join('')}</ul>
+                    <p><strong>Weather:</strong> ${city.weather}</p>
+                    <p><strong>Safety:</strong> ${city.safety}</p>
+                `;
+            } else {
+                cityInfoDiv.innerHTML = `<p>City not found. Please try another city.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Google Map</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333;
+        }
+        #map {
+            height: 80vh; /* Map takes up 80% of viewport height */
+            width: 100%;
+            border: 5px solid #ffd700; /* Yellow border */
+            border-radius: 10px;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        .status {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0000ff; /* Blue text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status" id="status">Loading map and fetching your location...</div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        function initMap() {
+            var defaultLocation = { lat: -34.397, lng: 150.644 };
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: defaultLocation,
+                styles: [ 
+                    {
+                        elementType: 'geometry',
+                        stylers: [{ color: '#eaeaea' }]
+                    },
+                    {
+                        elementType: 'labels.icon',
+                        stylers: [{ visibility: 'off' }]
+                    },
+                    {
+                        elementType: 'labels.text.fill',
+                        stylers: [{ color: '#0000ff' }]
+                    },
+                    {
+                        elementType: 'labels.text.stroke',
+                        stylers: [{ color: '#ffff00' }]
+                    }
+                ]
+            });
+            var marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map
+            });
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    map.setCenter(userLocation);
+                    marker.setPosition(userLocation);
+
+                    document.getElementById('status').innerText = 'Your current location is shown on the map.';
+                }, function() {
+                    handleLocationError(true, map.getCenter());
+                });
+            } else {
+                handleLocationError(false, map.getCenter());
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation, pos) {
+            var status = browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.';
+            document.getElementById('status').innerText = status;
+        }
+    </script>
+
+    <!-- Replace YOUR_API_KEY with your actual Google Maps JavaScript API key -->
+    <script async
+        src="https://maps.apple.com/?address=Hatkanangle%0AKolhapur%0AMaharashtra%20416118%0AIndia&auid=875485392014223609&ll=16.742465,74.382162&lsp=9902&q=Sanjay%20Ghodawat%20Institute">
+    </script>
+</body>
+</html>

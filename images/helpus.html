@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Crime Data</title>
+    <style>
+        body {
+            background-color: #99abb6;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #safetyLevel {
+            height: 30px;
+            width: 100%;
+            background-color: lightgray;
+            align-self: center;
+        }
+
+        #safetyBar {
+            height: 100%;
+            width: 0;
+        }
+
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 36px;
+            color: #333;
+            text-align: center;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 50px;
+            padding: 20px;
+            width: 1100px;
+            height: 600px; /* Increased height to accommodate advice section */
+            transition: transform 0.2s;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #safetyInfo {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .detail-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .detail-content {
+            text-align: left;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .detail-content ul {
+            list-style-type: square;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .detail-content li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a class="navbar-brand" href="#">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwwapJxTdmBdmmhBbRXU7EEZWYase7hPJv1A&s" alt="City Logo" />
+        </a>
+        <h1>Select a City to View Crime Data</h1>
+        <label for="city-select">Choose a city:</label>
+        <select id="city-select">
+            <option value="">--Select a city--</option>
+        </select>
+
+        <button id="showDataBtn">Show Crime Data</button>
+
+        <div id="safetyLevel">
+            <div id="safetyBar"></div>
+        </div>
+        <p id="safetyInfo"></p>
+        <div id="safetyAdvice" class="detail-content"></div>
+    </div>
+
+    <script>
+        const crimeData = [
+            { city: "Mumbai", cases: 1578, population: 20000000 },
+            { city: "Delhi", cases: 2350, population: 18000000 },
+            { city: "Bangalore", cases: 1234, population: 12000000 },
+            { city: "Kolkata", cases: 876, population: 15000000 },
+            { city: "Chennai", cases: 654, population: 10000000 },
+            { city: "Hyderabad", cases: 987, population: 9000000 },
+            { city: "Pune", cases: 543, population: 7000000 },
+            { city: "Ahmedabad", cases: 432, population: 8000000 },
+            { city: "Jaipur", cases: 654, population: 4000000 },
+            { city: "Lucknow", cases: 764, population: 3000000 }
+        ];
+
+        const citySelect = document.getElementById('city-select');
+
+        crimeData.forEach(data => {
+            const option = document.createElement('option');
+            option.value = data.city;
+            option.textContent = data.city;
+            citySelect.appendChild(option);
+        });
+
+        function calculateSafetyIndex(cityData) {
+            return (cityData.cases / cityData.population) * 1000; // Cases per 1000 residents
+        }
+
+        function getSafetyLevel(safetyIndex) {
+            if (safetyIndex < 0.09) {
+                return { level: 'Safe', color: 'green' };
+            } else if (safetyIndex < 0.18) {
+                return { level: 'Moderate', color: 'yellow' };
+            } else {
+                return { level: 'Unsafe', color: 'red' };
+            }
+        }
+
+        function displaySafetyAdvice(cases) {
+            if (cases < 700) {
+                return `
+                    <div class="detail-header">Safety Advice</div>
+                    <ul>
+                        <li>Enjoy your stay and feel free to explore different areas of the city.</li>
+                        <li>Remain aware of your surroundings and keep your belongings secure.</li>
+                        <li>In case of emergency, contact local authorities immediately.</li>
+                    </ul>
+                `;
+            } else if (cases < 2000) {
+                return `
+                    <div class="detail-header">Safety Advice</div>
+                    <ul>
+                        <li>Avoid walking alone in less crowded areas, especially at night.</li>
+                        <li>Stay alert and stick to well-lit streets.</li>
+                        <li>Keep emergency contact numbers handy.</li>
+                    </ul>
+                `;
+            } else {
+                return `
+                    <div class="detail-header">Safety Advice</div>
+                    <ul>
+                        <li>Consider joining guided tours to explore the city safely.</li>
+                        <li>Avoid traveling alone after dark; use reputable transport services.</li>
+                        <li>Stay in well-lit, populated areas and avoid isolated locations.</li>
+                    </ul>
+                `;
+            }
+        }
+
+        const showDataBtn = document.getElementById('showDataBtn');
+
+        showDataBtn.addEventListener('click', () => {
+            const selectedCity = citySelect.value;
+
+            if (selectedCity) {
+                const cityData = crimeData.find(data => data.city === selectedCity);
+                const safetyIndex = calculateSafetyIndex(cityData);
+                const safety = getSafetyLevel(safetyIndex);
+
+                const safetyBar = document.getElementById('safetyBar');
+                safetyBar.style.width = `${(safetyIndex / 0.3) * 100}%`;
+                safetyBar.style.backgroundColor = safety.color;
+
+                document.getElementById('safetyInfo').textContent = `Current Safety Level: ${safety.level}`;
+                document.getElementById('safetyAdvice').innerHTML = displaySafetyAdvice(cityData.cases);
+            } else {
+                alert('Please select a city.');
+            }
+        });
+    </script>
+</body>
+</html>

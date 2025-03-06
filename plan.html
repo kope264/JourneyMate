@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journey Itinerary Planner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: #333333;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+input[type="text"],
+input[type="date"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+}
+button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button:hover {
+    background-color: #45a049;
+}
+
+    </style>
+    <div class="container">
+        <h1>Journey Itinerary Planner</h1>
+        <form id="itineraryForm"   action="\plan"  method="POST">
+
+            <input type="text" id="startPlace" placeholder="Start Place" name="StartPlace" required>
+            <input type="text" id="destination" placeholder="Destination" name="EndPlace"required>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" required>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" required>
+            <button type="submit" onclick="Submit()">Create Itinerary</button>
+
+            
+        </form>
+        <div id="itineraryDisplay" class="itinerary-display">
+            <!-- Itinerary will be displayed here -->
+        </div>
+    </div>
+
+<script>
+    function submit(){
+        alert("Your Plan is Sucessfuly Inserted")
+    }
+</script>
+    <script >
+        document.getElementById('itineraryForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const startPlace = document.getElementById('startPlace').value;
+    const destination = document.getElementById('destination').value;
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+
+    // Calculate the number of days for the journey
+    const timeDiff = endDate.getTime() - startDate.getTime();
+    const dayCount = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    // Generate the itinerary
+    const itineraryDisplay = document.getElementById('itineraryDisplay');
+    itineraryDisplay.innerHTML = ''; // Clear previous itinerary
+
+    for (let i = 0; i <= dayCount; i++) {
+        const currentDay = new Date(startDate);
+        currentDay.setDate(startDate.getDate() + i);
+
+        const itineraryDay = document.createElement('div');
+        itineraryDay.classList.add('itinerary-day');
+
+        itineraryDay.innerHTML = `
+            <h2>Day ${i + 1} - ${currentDay.toDateString()}</h2>
+            <p><strong>Start Place:</strong> ${i === 0 ? startPlace : destination}</p>
+            <p><strong>Destination:</strong> ${destination}</p>
+        `;
+
+        // Customize this part to add more detailed plans for each day
+        if (i === 0) {
+            itineraryDay.innerHTML += '<p>Start your journey from ' + startPlace + ' and head towards ' + destination + '.</p>';
+        } else if (i === dayCount) {
+            itineraryDay.innerHTML += '<p>End your journey at ' + destination + '.</p>';
+        } 
+        else {
+            itineraryDay.innerHTML += '<p>Explore ' + destination + '.</p>';
+        }
+
+        itineraryDisplay.appendChild(itineraryDay);
+    }
+});
+    </script>
+
+
+</body>
+</html>

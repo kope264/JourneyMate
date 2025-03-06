@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007bff;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Geolocation and Maps Example</h1>
+        <button onclick="getLocation()">Get Directions</button>
+        <p id="status"></p>
+        <a id="maps-link" href="#" class="hidden" target="_blank">View Directions on Google Maps</a>
+    </div>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById('status').innerText = 'Geolocation is not supported by this browser.';
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Example fixed destination
+            const destination = 'Solapur,+Maharashtra';
+            
+            // Construct the Google Maps URL
+            const mapsUrl = https//www.google.com/maps/@16.744448,74.3800832,14z?entry=ttu&g_ep=EgoyMDI0MDgyOC4wIKXMDSoASAFQAw%3D%3D;
+            
+            // Display the link
+            const mapsLink = document.getElementById('maps-link');
+            mapsLink.href = mapsUrl;
+            mapsLink.classList.remove('hidden');
+            mapsLink.innerText = 'View Directions on Google Maps';
+        }
+
+        function showError(error) {
+            let message = '';
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    message = 'User denied the request for Geolocation.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = 'Location information is unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    message = 'The request to get user location timed out.';
+                    break;
+                case error.UNKNOWN_ERROR:
+                    message = 'An unknown error occurred.';
+                    break;
+            }
+            document.getElementById('status').innerText = message;
+        }
+    </script>
+    
+</body>
+</html>
