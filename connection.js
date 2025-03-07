@@ -1,6 +1,6 @@
 const mysql=require('mysql')
 var con=mysql.createConnection({
-    host:"Priyanka",
+    host:"localhost",
     user:"root",
     password:"Sush@264",
     database:"Travel"
