@@ -1,6 +1,6 @@
-# Journe Mate 🧳🌍  
+# JourneyMate 🧳🌍  
 
-**Journe Mate** is a travel itinerary website designed to help users plan and organize their trips efficiently. It provides an easy-to-use interface for creating, managing, and sharing travel plans.  
+**JourneyMate** is a travel itinerary website designed to help users plan and organize their trips efficiently. It provides an easy-to-use interface for creating, managing, and sharing travel plans.  
 
 ## 🌟 Features  
 - 📌 Create and customize travel itineraries  
